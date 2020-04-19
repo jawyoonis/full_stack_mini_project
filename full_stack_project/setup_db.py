@@ -32,7 +32,26 @@ class MenuItem(Base):
 
 	restaurant= relationship(Restaurant)
 
+class Employee(Base):
+	__tablename__='employee'
 
+	name= Column(String(250), nullable=False)
+
+	id= Column(Integer, primary_key=True)
+
+class Address(Base):
+
+	__tablename__="address_info"
+
+	id= Column(Integer, primary_key=True)
+
+	street= Column(String(80))
+
+	zip= Column(String(5))
+
+	employee_id=Column(Integer, ForeignKey('employee.id'))
+	
+	employee=relationship(Employee)
 
 ##### insert at end of file###
 engine= create_engine( 'sqlite:///restaurantmenu.db')
