@@ -35,7 +35,6 @@ class webServerHandler(BaseHTTPRequestHandler):
                     self.wfile.write(output)
                     print output
                     return
-
             if self.path.endswith("/restaurants"):
                 restaurants = session.query(Restaurant).all()
                 self.send_response(200)
