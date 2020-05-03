@@ -1,59 +1,100 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import cgi
+import colorama
+from colorama import Fore, Style
 
-class WebServerHandler(BaseHTTPRequestHandler):
+from setup_db import Base, Restaurant, MenuItem
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+#session sessionmaker
+engine= create_engine('sqlite:///restaurantmenu.db')
+Base.metadata.bind=engine
+DBSession= sessionmaker(bind=engine)
+session= DBSession()
+
+
+
+
+class webServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
-        if self.path.endswith("/hello"):
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            message = ""
-            message += "<html><body>Hello!</body></html>"
-            self.wfile.write(message)
-            print message
-            return
-	
-	if self.path.endswith("/hola"):
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            message = ""
-            message += "<html><body> &#161 Hola ! </body></html>"
-            self.wfile.write(message)
-            print message
-            return
+        try:
+            if self.path.endswith("/restaurants/new"):
+                # restaurants = session.query(Restaurant).all()
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                output = ""
+                    output += "<html><body>"
+                    output += "<h1> Create New Restaurant</h1>"
+                    output += "<form method='POST' enctype='multipart/form-data' action='/restaurants/new'><h2>"
+                    output+="<input name='newRestaurantName' type='text' placeholder='Insert Restaurant Here'>"
+                    output+= '<input type="submit" value="Create">'
+                    output += "</form></body></html>"
+                    self.wfile.write(output)
+                    print output
+                    return
 
-        else:
+            if self.path.endswith("/restaurants"):
+                restaurants = session.query(Restaurant).all()
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                output = ""
+                output += "<html><body>"
+                for restaurant in restaurants:
+                    output+=restaurant.name + ' <a href="{link}" style="color:green;">Edit</a>' + ' <a href="{link}" style="color:red;">Delete</a>'
+                    output+='</br></br>'
+
+                # output += "<h1>Hello!</h1>"
+                # output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
+                output += "</body></html>"
+                self.wfile.write(output)
+                print output
+                return
+
+            # if self.path.endswith("/hola"):
+            #     self.send_response(200)
+            #     self.send_header('Content-type', 'text/html')
+            #     self.end_headers()
+            #     output = ""
+            #     output += "<html><body>"
+            #     # output += "<h1>&#161 Hola !</h1>"
+            #     # output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
+            #     output += "</body></html>"
+            #     self.wfile.write(output)
+            #     print output
+            #     return
+
+        except IOError:
             self.send_error(404, 'File Not Found: %s' % self.path)
-    def do_post(self):
-	 try:
-	   self.send_response(301)
-	   self.send_header('Content-type', 'text/html')
-           self.end_headers()
-           ctype, pdict =cgi.parse_header(
-                  self.headers.getheader('content-type'))
-           if ctype=='multipart/form-data':
-	       fields= cgi.parse_multipart(self.rfile, pdict)
-               messagecontent=fields.get('message')
-           output=""
-           output++"<html><body>"
-           output+= "h<h2> okey, how about this: </h2>"
-           output+="<h2> %s </h1>" % messagecontent[0]
-           output+= '''<form method='POST' enctype='multipart/form-data' action='/hello'> what would you like to say? </h2><input name="message" type="text"> <input type="submit" value="Submit"> </form>'''
-           output+="</body></html>"
-           self.wfile.write(output)
-           print(output)
 
-         except:
-            pass 
+    def do_POST(self):
+        try:
+            if self.path.endswith("/restaurants/new"):
+                ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+                if ctype == 'multipart/form-data':
+                    fields = cgi.parse_multipart(self.rfile, pdict)
+                    messagecontent = fields.get("newRestaurantName")
+
+                    newRestaurant= Restaurant(messagecontent[0])
+                    session.add(newRestaurant)
+                    session.commit()
+                    self.send_response(301)
+                    self.send_header('Content-type', 'text/html')
+                    self.send_header('Location', '/restaurants')
+                    self.end_headers()
+
+        except:
+            pass
 
 
 def main():
     try:
         port = 8080
-        server = HTTPServer(('', port), WebServerHandler)
-        print "Web Server running on port %s" % port
+        server = HTTPServer(('', port), webServerHandler)
+        print "Open localhost:8080/restaurants in your browser"
         server.serve_forever()
     except KeyboardInterrupt:
         print " ^C entered, stopping web server...."

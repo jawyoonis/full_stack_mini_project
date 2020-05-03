@@ -1,8 +1,13 @@
 
+
+
+# session.add(menuItem)
+# session.commit()
+# Navigate your code with ease. Click on function and method calls to jump to their definitions or references in the same repository. Learn more
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from setup_db import Restaurant, Base, MenuItem, Employee, Address
+from setup_db import Restaurant, Base, MenuItem
 
 engine = create_engine('sqlite:///restaurantmenu.db')
 # Bind the engine to the metadata of the Base class so that the
@@ -22,6 +27,7 @@ session = DBSession()
 
 # Menu for UrbanBurger
 restaurant1 = Restaurant(name="Urban Burger")
+
 
 session.add(restaurant1)
 session.commit()
