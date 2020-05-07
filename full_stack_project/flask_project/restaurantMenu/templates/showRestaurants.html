@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+	<a href = '{{url_for("newRestaurant", restaurant_id= restaurant.id) }}'>Create new Restaurant</a>
+
+  <h1>{{restaurant.name}}</h1><br><br>
+
+  <a href='{{url_for("editRestaurant",restaurant_id = restaurant.id)}}' >Edit</a><br><br>
+  <a href='{{url_for("deleteRestaurant", restaurant_id = restaurant.id)}}' >
+  Delete</a>
+
+
+  <body>
+
+  </body>
+</html>
