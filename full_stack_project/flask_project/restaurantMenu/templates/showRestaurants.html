@@ -4,11 +4,27 @@
     <meta charset="utf-8">
     <title></title>
   </head>
-	<a href = '{{url_for("newRestaurant", restaurant_id= restaurant.id) }}'>Create new Restaurant</a>
+    <h1>{{restaurant.name}}</h1></br></br>
+    {% with messages= get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+          {% for message in messages %}
+          <li><strong>{{message}}</strong></li>
 
-  <h1>{{restaurant.name}}</h1><br><br>
+          {% endfor %}
 
-  <a href='{{url_for("editRestaurant",restaurant_id = restaurant.id)}}' >Edit</a><br><br>
+        </ul>
+
+    {% endif %}
+
+    {% endwith %}
+
+
+	<a href = '{{url_for("newRestaurant", restaurant_id= restaurant.id) }}'>Create new Restaurant</a> <br> </br>
+
+  <a href='{{url_for("editRestaurant",restaurant_id = restaurant.id)}}' >Edit</a> <br>
+</br>
+
   <a href='{{url_for("deleteRestaurant", restaurant_id = restaurant.id)}}' >
   Delete</a>
 
